@@ -181,7 +181,9 @@ struct Bytebeat : Module {
                 t++;
 
                 if (!text.empty() && !badInput) {
+#ifndef METAMODULE
                     try {
+#endif
                         int n = (int)params[BIT_PARAM].getValue();
                         int resolution = (1 << n) - 1;
                         BytebeatParser parser(text);
@@ -197,10 +199,12 @@ struct Bytebeat : Module {
                         float maxV = levels[outputLevelType][1];
 
                         output = out * (maxV - minV) + minV;
+#ifndef METAMODULE
                     } catch (const std::exception& e) {
                         badInput = true;
                         DEBUG("Exception caught: %s", e.what());
                     }
+#endif
                 } else {
                     output = 0.f;
                 }

@@ -18,8 +18,11 @@ class BytebeatParser {
         int result = parseConditional();
         skipWhitespace();
         if (pos < expr.size()) {
+#ifndef METAMODULE
             throw std::runtime_error("Unexpected character at position " + std::to_string(pos));
+#else
             return 0;
+#endif
         }
         return result;
     }
@@ -37,7 +40,11 @@ class BytebeatParser {
         if (match('?')) {
             int true_expr = parseConditional();
             if (!match(':')) {
+#ifndef METAMODULE
                 throw std::runtime_error("Expected ':' after '?' at position " + std::to_string(pos));
+#else
+                return 0;
+#endif
             }
             int false_expr = parseConditional();
             return condition ? true_expr : false_expr;
@@ -237,9 +244,13 @@ class BytebeatParser {
         if (match('(')) {
             int value = parseConditional();
             if (!match(')')) {
+#ifndef METAMODULE
                 std::ostringstream oss;
                 oss << "Expected closing parenthesis at position " << pos;
                 throw std::runtime_error(oss.str());
+#else
+                return 0;
+#endif
             }
             return value;
         } else if (match('t')) {
@@ -253,9 +264,13 @@ class BytebeatParser {
         } else if (isdigit(peek())) {
             return parseNumber();
         } else {
+#ifndef METAMODULE
             std::ostringstream oss;
             oss << "Unexpected character '" << peek() << "' at position " << pos;
             throw std::runtime_error(oss.str());
+#else
+            return 0;
+#endif
         }
     }
 
@@ -310,6 +325,7 @@ bool runTest(const std::string& expression, uint32_t t, int expected) {
 }
 
 int main() {
+#ifndef METAMODULE
     std::string expression;
     int t = 1234567;
 
@@ -317,7 +333,7 @@ int main() {
     std::cout << "Test 1: "
               << (runTest("t % (t >> 10 & t)", t, test1) ? "PASS" : "FAIL")
               << std::endl;
-
+#endif
     return 0;
 }
 
