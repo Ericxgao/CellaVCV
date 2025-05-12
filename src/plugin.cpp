@@ -11,6 +11,4 @@ void init(Plugin *p) {
     p->addModel(modelTwinPeaks);
     p->addModel(modelResonators);
     p->addModel(modelCognitiveShift);
-    p->addModel(modelLoudnessMeter);
-    p->addModel(modelLoud);
 }
