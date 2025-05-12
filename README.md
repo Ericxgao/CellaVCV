@@ -5,12 +5,14 @@
 ## Modules Overview
 
 
-<img src="docs/Dark.png" alt="Cella - Dark Theme" style="width: 615px;">
+<img src="docs/Dark.jpg" alt="Cella - Dark Theme" style="width: 900px;">
 
 ### Resonators
 **Resonators** is a module that features four pitched resonators based on the Karplus-Strong algorithm. It is designed to create rich, resonant sounds by simulating the behavior of plucked strings or other resonant bodies. Functionality is inspired by audio effect of the same name found in popular DAW.
 
 [YOUTUBE: Cella - Resonators DEMO](https://www.youtube.com/watch?v=gn_RQxh0R7A)
+
+[**Resonators demo by Omri Cohen (YouTube)**](https://www.youtube.com/watch?v=IwO37pXGd5A)
 
 
 ### Twin Peaks
@@ -29,6 +31,18 @@ Under the hood, the module uses the DSP core from Audible Instruments' Liquid Fi
 
 ### Bezier
 **Bezier** is a smooth random voltage generator based on Bezier curves. Heavily inspired by module ADDAC507, which ADDAC designed in collaboration with Rijnder Kamerbeek aka Monotrail. Module consists of one curve generator with adjustable slope - from rounded to spiky. New random value is sampled at set frequency, and module extrapolates to it from current value following curve of desired properties. Module can also sample external signal, thus working as a sort of slew limiter.
+
+### Cognitive Shift
+
+**Cognitive Shift** is an advanced 8-bit digital shift register module for VCV Rack. It goes beyond basic shift register functionality by incorporating flexible input logic (including XOR and selectable logic operations), manual data overrides, three overlapping unipolar DAC outputs, a bipolar 8-bit DAC output, and configurable gate output modes. It also features intelligent self-patching detection to facilitate complex feedback patterns.
+
+Main differentiator from other implementations is the ability to output triggers or gates per each step without merging consecutive gates together, and yet allow for self-patching.
+
+[YOUTUBE: Cella - Cognitive Shift DEMO](https://www.youtube.com/watch?v=w_rUmVgKfsE)
+
+### Loudness Meter
+
+**Loudness Meter** and its narrow version **Loud** are a comprehensive audio loudness meters based on the EBU R128 standard, utilizing the [libebur128](https://github.com/jiixyj/libebur128) library for accurate measurements.
 
 ### Euler
 **Euler** calculates rate of change of any signal. It finds angle *theta* of a slope of incoming signal, normalises it by 90 degrees and scales to -10..10V. *Frequency* parameter is required to adjust calculation sensitivity, while parameter *Smooth* removes irregularities from the input. There are four outputs: theta, absolute value of theta, positive component of theta and negative component of theta.

@@ -1,6 +1,6 @@
 # Cella – User Manual
 
-# Version 2.0.6
+# Version 2.8.1
 
 # **LICENSE**
 
@@ -8,7 +8,7 @@ Source code for this plugin can be found on GitHub: [https://github.com/victorka
 
 Code is licensed under GPL v3.0.
 
-All graphics are copyright 2024 Victor Kashirin and licensed under CC BY-SA 4.0.
+All graphics are copyright 2024-2025 Victor Kashirin and licensed under CC BY-SA 4.0.
 
 
 # **Rich**
@@ -164,7 +164,9 @@ Parameter **SMOOTH** applies smoothing over a set time period – up to 1 second
 
 <img src="images/Resonators.png" alt="Cella - Resonators" style="height: 380px;">
 
-[**Resonators Demo (YouTube)**](https://www.youtube.com/watch?v=gn_RQxh0R7A)
+[Resonators DEMO (YouTube)](https://www.youtube.com/watch?v=gn_RQxh0R7A)
+
+[Resonators DEMO by Omri Cohen (YouTube)](https://www.youtube.com/watch?v=IwO37pXGd5A)
 
 **Resonators** is a module that features four pitched resonators based on the Karplus-Strong algorithm. It is designed to create rich, resonant sounds by simulating the behavior of plucked strings or other resonant bodies. Functionality is inspired by audio effect of the same name found in the popular DAW.
 
@@ -244,3 +246,192 @@ You can also find and test a lot of bytebeats online [here](https://dollchan.net
 
 Taken from [here](http://viznut.fi/demos/unix/bytebeat_formulas.txt)
 
+
+# **Cognitive Shift**
+
+<img src="images/CognitiveShift.png" alt="Cella - Cognitive Shift" style="height: 380px;">
+
+[Cognitive Shift DEMO (YouTube)](https://www.youtube.com/watch?v=w_rUmVgKfsE)
+
+Cognitive Shift is an advanced 8-bit digital shift register module for VCV Rack. It goes beyond basic shift register functionality by incorporating flexible input logic (including XOR and selectable logic operations), manual data overrides, data edit mode, three overlapping unipolar 4-bit DAC outputs, a bipolar/unipolar 8-bit DAC output, and configurable gate output modes. It also features intelligent self-patching detection to facilitate complex feedback patterns.
+
+Main differentiator from other implementations is the ability to output clocks, triggers or gates per each step without merging consecutive values together, and yet allow for self-patching. This was inspised by shift register behaviour of "Double Knot" instrument by Lorre Mill.
+
+## Core Concept: The Shift Register
+
+At its heart, Cognitive Shift is an 8-bit memory bank.
+
+1.  **Clocking:** When a trigger or gate signal arrives at the **CLOCK** input (specifically, on its rising edge), the module performs a "shift" operation.
+2.  **Input:** Before shifting, the module determines the value (1 or 0, High or Low) of the *next bit* to be introduced into the register. This is based on the **DATA**, **XOR**, and **LOGIC** inputs, **THRESHOLD** parameter, as well as the **WRITE** and **ERASE** buttons.
+3.  **Shifting:** The determined input bit becomes the new state of Bit 1. The previous state of Bit 1 moves to Bit 2, Bit 2 moves to Bit 3, and so on, up to Bit 7 moving to Bit 8. The previous state of Bit 8 is discarded.
+4.  **Output:** The state of each of the 8 bits (0 or 1) is available at the individual **BIT 1-8** outputs and is used to generate the various DAC-based CV outputs.
+
+## Features
+
+*   8-bit digital shift register.
+*   Clock-driven operation via the **CLOCK** input.
+*   Flexible data input threshold control (**THRES** knob and **THRES CV** input/attenuverter).
+*   Multiple input sources for determining the next bit:
+    *   **DATA** input (primary voltage input).
+    *   **WRITE** button (manually force input bit to 1).
+    *   **ERASE** button (manually force input bit to 0).
+    *   **LOGIC** input (combines with the DATA/Buttons result using a selectable logic function).
+    *   **XOR** input (XORs with the DATA/Buttons/LOGIC value).
+*   Manual input mode enabled by **EDIT** button.
+*   Manual **CLEAR** button and CV input to set all bits to 0 instantly.
+*   8 individual bit outputs (**BIT 1** to **BIT 8**) with selectable behavior (Clock, Gate, Trigger) via the context menu.
+*   Multiple Digital-to-Analog Converter (DAC) outputs:
+    *   Three 4-bit DAC unipolar outputs (**1-4**, **3-6**, **5-8**) with individual attenuators, providing CV based on overlapping bit ranges (0V to +10V before attenuation).
+    *   One 8-bit configurable bipolar/unipolar output (**1-8**) with an attenuverter, providing CV based on all 8 bits (-5V to +5V or 0V to +10V before attenuation).
+*   Intelligent self-patching detection for stable feedback loops.
+*   Context menu options for Bit Output Mode, Logic Type selection, and Input Override behavior.
+
+## Operational Details
+
+### Input Logic Determination
+
+On each rising edge of the **CLOCK** input, Cognitive Shift determines the next bit (Bit 1) to enter the shift register using the following priority-based logic:
+
+1. **Manual Overrides (WRITE/ERASE buttons):**
+   - Pressing the **WRITE** button forces the input bit to `1`.
+   - Pressing the **ERASE** button forces the input bit to `0`.
+   - If the **Input overrides** option (context menu) is set to "Everything", this manual override directly determines the bit without considering other inputs.
+
+2. **DATA Input:**
+   - If neither button is pressed, the voltage at the **DATA** input is checked against the effective threshold (**THRES** knob ± modulated by **THRES CV**).
+   - If the voltage at **DATA** is equal to or greater than the threshold, the bit is set to `1`; otherwise, it’s set to `0`.
+
+3. **LOGIC Input:**
+   - If a cable is connected to the **LOGIC** input, its voltage is compared against the threshold in the same manner.
+   - The resulting logic bit (`1` or `0`) is combined with the result from the previous step using the logic operation selected in the context menu.
+
+4. **XOR Input:**
+   - If connected, the voltage at the **XOR** input is compared against the threshold.
+   - This XOR bit (`1` or `0`) is XORed with the result from the previous step to produce the final bit value.
+
+**Note:** Inputs (**DATA**, **LOGIC**, **XOR**) influence the determination process only when cables are connected. Unconnected inputs are effectively ignored.
+
+### Logic Types (Context Menu)
+
+The logic type determines how the **LOGIC** input combines with the DATA input bit. This can be configured via the context menu "Logic types":
+
+- **XOR (Default):** Outputs `1` if exactly one of DATA or LOGIC bits is `1`; otherwise, `0`.
+- **NAND:** Outputs `0` only if both DATA and LOGIC bits are `1`; otherwise, outputs `1`.
+- **XNOR:** Outputs `1` if DATA and LOGIC bits are identical; otherwise, outputs `0`.
+- **OR:** Outputs `1` if at least one of DATA or LOGIC bits is `1`; otherwise, `0`.
+- **AND:** Outputs `1` only if both DATA and LOGIC bits are `1`; otherwise, outputs `0`.
+- **NOR:** Outputs `1` only if both DATA and LOGIC bits are `0`; otherwise, outputs `0`.
+
+Selecting different logic types allows the creation of diverse and complex patterns, especially when combined with manual inputs or self-(cross-)patching techniques.
+
+**Tip**: you can see currently selected logic type in the tooltip if you hover mouse over LOGIC port.
+
+
+### Bit Output Modes (Context Menu)
+
+You can change how the individual **BIT 1-8** outputs behave by right-clicking the module panel and selecting an option under "Bit output mode":
+
+*   **Clocks:** When a bit is High (1), its output jack will pass through the signal present at the **CLOCK** input. If the bit is Low (0), the output is 0V. Useful for creating clock divisions or rhythmic gate patterns based on the CLOCK input waveform.
+*   **Gates:** When a bit is High, its output jack emits a constant high voltage of +10V. When the bit is Low, the output is 0V. Note that consecutive positive bits generate one long gate rather than few individual ones.
+*   **Triggers:** When a bit is High *and* a **CLOCK** pulse arrives, its output jack emits a short trigger pulse.
+
+## Self-Patching
+
+Cognitive Shift is designed to handle self-patching gracefully. This means you can connect one of its own outputs (e.g., **BIT 3**) to one of its inputs (e.g., **DATA**, **XOR**, **LOGIC**) without causing instability common in digital feedback loops.
+
+*   **Detection:** The module automatically detects when an input is connected to an output of another Cognitive Shift module (or itself).
+*   **Timing Compensation:** When reading an input that is self-patched, if the source output bit changed *on the exact same clock event* that is currently being processed, the module reads the *previous* state of that bit (the state *before* the current clock pulse). This prevents a one-sample feedback delay that can lead to unpredictable behavior. If the source bit changed on a different clock cycle, its current value is read as normal.
+
+**Why use self-patching?**
+Self-patching allows Cognitive Shift to generate complex, evolving, and often pseudo-random sequences based on its own internal state. For example:
+*   Patching **BIT 8** to **DATA** creates a simple feedback loop.
+*   Patching **BIT 5** to **XOR** and **BIT 8** to **DATA** creates patterns similar to a Linear Feedback Shift Register (LFSR), often used for pseudo-random sequence generation. Programing **LOGIC** to **NAND** and patching another bit into it gives NLFSR.
+*   Experimenting with different bit outputs patched into **DATA**, **XOR**, and **LOGIC** inputs, potentially combined with different **Logic Types**, can yield a vast range of complex rhythmic and melodic patterns.
+* Combining few **Cognitive Shift** modules allow to create long evolving yet deterministic sequences.
+
+**Important disclaimer**
+Due to complex logic of handling self-patching, stacked cables on DATA, XOR and LOGIC won't be handled properly. If you need to merge few sources of data, program LOGIC input to `OR` mode.
+
+## Patch Ideas
+
+*   **Basic Sequencer:** Use **BIT 1-8** outputs (in Gate mode) to trigger drum sounds or envelopes for an 8-step sequence. Manually enter patterns with **WRITE**/**ERASE**, or feed a gate pattern into **DATA**.
+*   **CV Sequencer:** Use the **DAC** outputs to generate stepped CV sequences for pitch or modulation.
+*   **Clock Divider/Multiplier:** Use **BIT** outputs in Clock mode with specific patterns loaded.
+*   **Rhythmic Complexity:** Patch outputs back into **DATA**, **XOR**, or **LOGIC** inputs. Use external random sources or LFOs into these inputs as well. Experiment with different Logic Types. Cross-patch few **Cognitive Shift** modules for longer and more complex sequences.
+*   **Complex Modulation:** Use the **DAC** outputs, potentially with slow clock rates, to generate evolving CV signals.
+*   **Generative Melodies:** Use pseudo-random patterns generated via self-patching into the **DAC** output, quantize the result, and use it for pitch sequencing.
+
+
+# Loudness Meter
+
+<img src="images/LoudnessMeter.png" alt="Cella - Loudness Meter" style="height: 380px;">
+
+A comprehensive audio loudness meter based on the EBU R128 standard, utilizing the [libebur128](https://github.com/jiixyj/libebur128) library for accurate measurements.
+
+## Inputs
+
+Inputs expect standard VCV Rack +/- 10V signals, which are scaled internally to +/- 1.0f for processing.
+
+*   **Reset**: Resets all integrated, maximum, and historical measurements when a trigger signal (rising edge, typically > 1V) is received.
+
+*   **LEFT**: Left channel audio input. Serves as the primary input for mono signals or the left channel of a stereo pair.
+*   **RIGHT**: Right channel audio input. Used for the right channel of a stereo pair.
+
+**Input Interpretation & Processing Mode:**
+
+The way the connected audio inputs are interpreted and processed depends on the **Processing mode** selected in the module's context menu:
+
+*   **Auto (Default):** This mode automatically adapts to the connections.
+    *   If *only* 'LEFT' or *only* 'RIGHT' is connected, the signal is processed as **mono**.
+    *   If *both* 'LEFT' and 'RIGHT' are connected, the signal is processed as **stereo**.
+
+*   **Mono:** This mode forces the processing to be **mono**, regardless of input connections.
+    *   If *both* 'LEFT' and 'RIGHT' are connected, they are mixed down to mono before processing.
+    *   If *only* 'LEFT' or *only* 'RIGHT' is connected, that single input is used directly as the mono source.
+
+*   **Stereo:** This mode forces the processing to be **stereo**, regardless of input connections.
+    *   If *both* 'LEFT' and 'RIGHT' are connected, they are processed as a standard stereo pair.
+    *   If *only* 'LEFT' is connected, its signal is duplicated to both the left and right channels for stereo processing.
+    *   If *only* 'RIGHT' is connected, *its* signal is duplicated to both the left and right channels for stereo processing.
+
+**Why Mode Matters:** The selected mode directly influences the final loudness value. Because the ITU-R BS.1770 standard sums the energy from both channels for stereo analysis (but only uses the single channel for mono), processing the same mono audio signal in 'Stereo' mode will typically result in a reading approximately 3 LUFS higher than processing it in 'Mono' mode. For uncorrelated stereo signal that difference might be higher or lower.
+
+## Controls
+
+*   **Reset Button**: Manually resets all integrated, maximum, and historical measurements when clicked.
+*   **Target Loudness**: Sets the target loudness level in LUFS (Loudness Units Full Scale), ranging from -36 LUFS to 0 LUFS (default: -23 LUFS). This primarily affects the visualization on the Momentary Loudness bar, indicating levels below (white) or above (red) the target. On **Loud**, target loudness can be adjusted with a slider in the context menu.
+
+## Measurements & Displays
+
+The module features a large display area showing several loudness metrics:
+
+1.  **Momentary Loudness (M) Bar**: Displays the momentary loudness (measured over a 400ms window) as a vertical bar graph. The bar is white up to the **Target Loudness** value and turns red above it. Small bracket indicates the current **Loudness Range**.
+
+2.  **SHORT TERM (S)**: Displays the short-term loudness (measured over a 3s window). Calculation can be disabled via the context menu.
+
+3.  **INTEGRATED (I)**: Displays the integrated loudness (overall program loudness) calculated since the last reset. This value is saved and restored with the patch.
+
+4.  **DYNAMICS (PSR)**: Displays the Peak to Short-term Loudness Ratio (PSR). This is the difference between the *sliding maximum true peak* (measured over the last ~2.5 seconds) and the current *short-term loudness*. Provides an indication of recent dynamic range.
+
+5.  **AVG DYN (PLR)**: Displays the Peak to integrated Loudness Ratio (PLR). This is the difference between the *overall maximum true peak* recorded since the last reset and the current *integrated loudness*. Provides an indication of the overall dynamic range of the program material since the last reset.
+
+6.  **LOUDNESS RANGE (LRA)**: Displays the statistical loudness range, indicating the variation in loudness throughout the measurement period (since the last reset).
+
+7.  **MOMENTARY MAX (MMAX)**: Displays the maximum momentary loudness level recorded since the last reset.
+
+8.  **SHORT TERM MAX (SMAX)**: Displays the maximum short-term loudness level recorded since the last reset.
+
+9.  **TRUE PEAK MAX (TPMAX)**: Displays the maximum true peak level (accounting for inter-sample peaks) recorded on either channel since the last reset. The value turns red if it exceeds -0.5 dBTP, indicating potential clipping after D/A conversion.
+
+## Context Menu
+
+Right-clicking the panel opens the context menu, which includes:
+
+*   **Processing mode**: Selects how the audio inputs are interpreted for analysis.
+    *   **Auto (Default)**: Automatically selects mono (1 input connected) or stereo (2 inputs connected) processing.
+    *   **Mono**: Forces mono processing, mixing L and R if both are connected.
+    *   **Stereo**: Forces stereo processing, duplicating a single input if only one is connected.
+
+*   **Short-Term Loudness**:
+    *   **Enabled (Default)**: Calculates and displays Short-Term Loudness and PSR.
+    *   **Disabled**: Disables Short-Term Loudness and PSR calculations and display. This can slightly reduce CPU usage if these metrics are not needed.

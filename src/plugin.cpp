@@ -11,6 +11,8 @@ void init(Plugin *p) {
     p->addModel(modelTwinPeaks);
     p->addModel(modelResonators);
 #ifndef METAMODULE
-    p->addModel(modelBytebeat);
+    p->addModel(modelCognitiveShift);
+    p->addModel(modelLoudnessMeter);
+    p->addModel(modelLoud);
 #endif
 }
