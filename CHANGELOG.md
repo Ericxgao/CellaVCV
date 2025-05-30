@@ -1,5 +1,14 @@
 # Cella modules changelog
 
+### 2.9.0 (2025-05-24)
+
+New modules:
+* Integral - signal integrator.
+* 2State - combination of dual constant CV generator and a voltage-controlled switch.
+
+Updates:
+* Resonators - fix highpass filter cutoff setting, use cubic interpolation.
+
 ### 2.8.1 (2025-04-27)
 Bugfix:
 * Fix font rendering in Loud and Loudness Meter in DAWs

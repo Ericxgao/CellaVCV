@@ -48,5 +48,14 @@ Main differentiator from other implementations is the ability to output triggers
 **Euler** calculates rate of change of any signal. It finds angle *theta* of a slope of incoming signal, normalises it by 90 degrees and scales to -10..10V. *Frequency* parameter is required to adjust calculation sensitivity, while parameter *Smooth* removes irregularities from the input. There are four outputs: theta, absolute value of theta, positive component of theta and negative component of theta.
 Suggested use: connect controller such as fader to Euler. The faster you move the fader, the higher a peak out of Euler will be before it subsides.
 
+### Integral
+
+Signal integrator.
+
 ### Byte
 **Byte** is a bytebeat evaluator that allows users to create complex audio signals using bytebeat expressions. The module features several parameters and inputs to modulate the bytebeat expressions in real-time. It also supports various bit-depth of the output.
+
+
+### 2State
+
+**2State** is a triple voltage-controlled switch, allowing you to define two distinct voltage levels per channel and switch between them using gate signals or manual buttons. Each section can operate in either a momentary 'GATE' mode or a 'LATCH' mode, where a trigger toggles the output state. Its cascading gate input behavior allows for synchronized control across multiple sections.
